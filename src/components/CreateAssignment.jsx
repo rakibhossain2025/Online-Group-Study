@@ -13,7 +13,6 @@ const CreateAssignment = () => {
     const form = e.target;
     const formData = new FormData(form);
     const submitAssignment = Object.fromEntries(formData.entries());
-    submitAssignment.createdBy = user?.email;
     submitAssignment.dueDate = dueDate.toISOString().split("T")[0];
     fetch("http://localhost:2002/assignments", {
       method: "POST",
@@ -88,7 +87,7 @@ const CreateAssignment = () => {
         </select>
         <input
           type="email"
-          name="email"
+          name="createdByEmail"
           value={user?.email || ""}
           className="w-full border border-gray-300 rounded-lg px-4 py-3 bg-gray-100 text-gray-700 cursor-not-allowed"
           placeholder="Your email"

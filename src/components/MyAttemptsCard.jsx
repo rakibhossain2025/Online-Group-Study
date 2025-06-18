@@ -1,6 +1,6 @@
 const MyAttemptsCard = ({ dt }) => {
   return (
-    <tr>
+    <tr className="bg-gray-200  hover:bg-gray-300">
       <td>{dt.title || "Untitled"}</td>
       <td>
         {dt.status === "reviewed" ? (
@@ -9,10 +9,12 @@ const MyAttemptsCard = ({ dt }) => {
           <span className="text-yellow-600 font-semibold">Pending</span>
         )}
       </td>
-      <td>{dt.title || "N/A"}</td>
-      <td>{dt.marks || "Not marked yet"}</td>
+      <td>{dt.TotalMarks || "N/A"}</td>
+      <td>{dt.
+        givenMark || "Not marked yet"}</td>
       <td>{dt.feedback || "No feedback yet"}</td>
-      <td>{dt.examiner || "-"}</td>
+      <td>{dt.examinerEmail
+        || "-"}</td>
     </tr>
   );
 };

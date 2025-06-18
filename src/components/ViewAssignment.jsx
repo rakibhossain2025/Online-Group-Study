@@ -1,12 +1,12 @@
 import { useState, useContext } from 'react';
 import { useLoaderData } from 'react-router';
 import { AuthContext } from '../context/AuthContext';
+import GetUser from '../context/GetUser';
 
 const ViewAssignment = () => {
   const assignment = useLoaderData();
-  console.log(assignment)
   const { user } = useContext(AuthContext);
-  const { _id, title, description, marks, examineEmail, thumbnail, difficulty } = assignment || {};
+  const { _id, title, description, marks, createdByEmail, thumbnail, difficulty } = assignment || {};
   const [modalOpen, setModalOpen] = useState(false);
   const [googleDocLink, setGoogleDocLink] = useState('');
   const [note, setNote] = useState('');
@@ -16,22 +16,24 @@ const ViewAssignment = () => {
     e.preventDefault();
     if (!googleDocLink) return alert('Google Docs link must be provided!');
     setLoading(true);
-
     try {
       const res = await fetch('http://localhost:2002/take-assignment', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          assignmentId: _id,
-          TotalMarks: marks,
-          title,
-          examineEmail: user.email,
-          examineName: user.displayName,
-          docsLink: googleDocLink,
-          note,
-          status: "pending",
-        }),
-      });
+        headers: {
+            Authorization: `Bearer ${user.accessToken}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            assignmentId: _id,
+            TotalMarks: marks,
+            title,
+            examineEmail: user.email,
+            examineName: user.displayName,
+            docsLink: googleDocLink,
+            note,
+            status: "pending",
+          }),
+        });
       const data = await res.json();
       if (res.ok) {
         alert('Assignment submitted successfully!');
@@ -81,7 +83,7 @@ const ViewAssignment = () => {
               </span>
             </div>
             {
-              examineEmail === user?.email ? ':' :
+              createdByEmail === user?.email ? 'my assignment' :
                 <button
 
                   onClick={() => setModalOpen(true)}

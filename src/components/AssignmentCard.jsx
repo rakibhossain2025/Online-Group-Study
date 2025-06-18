@@ -1,232 +1,113 @@
-// import React from "react";
-
-// const AssignmentCard = ({assignment}) => {
-
-//     const {title, description, marks, thumbnail, difficulty} = assignment;
-
-//   return (
-//     <div className="card card-side bg-base-100 shadow-sm">
-//       <figure>
-//         <img
-//           src={thumbnail}
-//           alt="Movie"
-//         />
-//       </figure>
-//       <div className="card-body">
-//         <h2 className="card-title">New movie is released!</h2>
-//         <p>Click the button to watch on Jetflix app.</p>
-//         <div className="card-actions justify-end">
-//           <button className="btn btn-primary">Watch</button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AssignmentCard;
-
-// import React from "react";
-// import { Pencil, Trash2, Eye } from "lucide-react";
-// import Swal from "sweetalert2";
-
-// const AssignmentCard = ({ assignment }) => {
-//   const {_id, title, description, marks, thumbnail, difficulty } = assignment;
-
-//   const handleDelete = (_id) => {
-//     console.log(_id)
-//     Swal.fire({
-//   title: "Are you sure?",
-//   text: "You won't be able to revert this!",
-//   icon: "warning",
-//   showCancelButton: true,
-//   confirmButtonColor: "#3085d6",
-//   cancelButtonColor: "#d33",
-//   confirmButtonText: "Yes, delete it!"
-// }).then((result) => {
-//   console.log(result.isConfirmed)
-//   if (result.isConfirmed) {
-
-//     fetch(`http://localhost:2002/assignments/${_id}`, {
-//       method: 'DELETE'
-//     })
-//     .then(res => res.json())
-//     .then(data => {
-//       console.log(data)
-//     })
-
-//     Swal.fire({
-//       title: "Deleted!",
-//       text: "Your file has been deleted.",
-//       icon: "success"
-//     });
-//   }
-// });
-//   }
-
-//   const difficultyColors = {
-//     easy: "bg-green-500",
-//     medium: "bg-yellow-500",
-//     hard: "bg-red-500",
-//   };
-
-//   return (
-//     <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden transition-all duration-300 hover:shadow-2xl flex flex-col md:flex-row">
-//       {/* Thumbnail Image */}
-//       <div className="md:w-1/3 w-full h-60 md:h-auto overflow-hidden">
-//         <img
-//           src={thumbnail || "https://via.placeholder.com/400x300?text=Assignment"}
-//           alt={title}
-//           className="object-cover w-full h-full transition-transform duration-300 hover:scale-105"
-//         />
-//       </div>
-
-//       {/* Content Section */}
-//       <div className="md:w-2/3 p-6 flex flex-col justify-between">
-//         <div>
-//           <h2 className="text-2xl font-bold text-gray-900 mb-2">{title}</h2>
-//           <p className="text-gray-700 text-sm mb-4 line-clamp-3">{description}</p>
-
-//           <div className="flex items-center justify-between mb-4">
-//             <span className="text-sm font-medium text-indigo-600">
-//               Marks: <span className="font-bold">{marks}</span>
-//             </span>
-
-//             {difficulty && (
-//               <span
-//                 className={`text-white text-xs font-semibold px-3 py-1 rounded-full ${
-//                   difficultyColors[difficulty.toLowerCase()] || "bg-gray-400"
-//                 }`}
-//               >
-//                 {difficulty.charAt(0).toUpperCase() + difficulty.slice(1)}
-//               </span>
-//             )}
-//           </div>
-//         </div>
-
-//         {/* Action Buttons */}
-//         <div className="flex justify-end space-x-3 mt-4">
-//           <button className="flex items-center gap-1 px-4 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition">
-//             <Eye size={16} /> View
-//           </button>
-//           <button className="flex items-center gap-1 px-4 py-2 bg-yellow-500 text-white text-sm rounded-md hover:bg-yellow-600 transition">
-//             <Pencil size={16} /> Update
-//           </button>
-//           <button onClick={() => handleDelete(_id)} className="flex items-center gap-1 px-4 py-2 bg-red-600 text-white text-sm rounded-md hover:bg-red-700 transition">
-//             <Trash2 size={16} /> Delete
-//           </button>
-//         </div>
-//       </div>
-//     </div>
-//   );
-// };
-
-// export default AssignmentCard;
-
 import React, { useContext } from "react";
 import { Pencil, Trash2, Eye } from "lucide-react";
 import Swal from "sweetalert2";
 import { AuthContext } from "../context/AuthContext";
 import { Link } from "react-router";
-// import { AuthContext } from "../context/AuthContext";
+import axios from "axios";
 
-const AssignmentCard = ({
-  assignment,
-  onDelete,
-  assignments,
-  setAssignments,
-}) => {
+const AssignmentCard = ({ assignment, userEmail, onDelete, assignments, setAssignments, }) => {
   const { user } = useContext(AuthContext);
-  const { _id, title, description, marks, thumbnail, difficulty, createdBy } =
+  const { _id, title, description, marks, thumbnail, difficulty, createdByEmail } =
     assignment;
 
-  const handleDelete = (_id) => {
-    if (user?.email !== createdBy) {
-      Swal.fire({
+  const handleDelete = () => {
+    if (user?.email !== createdByEmail) {
+      return Swal.fire({
         icon: "error",
-        title: "Permission Denied!",
-        text: "You can only delete assignments you have created.",
+        title: "Permission Denied",
+        text: "You can only delete your own assignments.",
       });
-      return;
     }
+    console.log(user.email)
 
     Swal.fire({
       title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      text: "This action cannot be undone.",
       icon: "warning",
       showCancelButton: true,
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33",
-      confirmButtonText: "Yes, delete it!",
+      confirmButtonText: "Delete",
+      cancelButtonText: "Cancel",
+      confirmButtonColor: "#dc2626",
     }).then((result) => {
       if (result.isConfirmed) {
-        fetch(`http://localhost:2002/assignments/${_id}?email=${user?.email}`, {
-          method: "DELETE",
+        axios.delete(`http://localhost:2002/assignments/${_id}?email=${user?.email}`, {
+          headers: { Authorization: `Bearer ${user.accessToken}` }
         })
-          .then((res) => res.json())
           .then((data) => {
-            if (data.deletedCount > 0) {
-              Swal.fire(
-                "Deleted!",
-                "Your assignment has been deleted.",
-                "success"
-              );
+            if (data.data.deletedCount > 0) {
+              Swal.fire("Deleted!", "Assignment has been removed.", "success");
               onDelete(_id);
+              const remaining = assignments.filter((a) => a._id !== _id);
+              setAssignments(remaining);
             }
-
-            const remainingAssignments = assignments.filter(
-              (ass) => ass._id !== _id
-            );
-            setAssignments(remainingAssignments);
           });
       }
     });
   };
-
-  const difficultyColors = {
-    easy: "bg-green-500",
-    medium: "bg-yellow-500",
-    hard: "bg-red-500",
+  
+  const getDifficultyStyle = (level) => {
+    switch (level?.toLowerCase()) {
+      case "easy":
+        return "bg-green-100 text-green-700";
+      case "medium":
+        return "bg-yellow-100 text-yellow-700";
+      case "hard":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-200 text-gray-600";
+    }
   };
 
   return (
-    <div className="max-w-3xl mx-auto bg-white shadow-xl rounded-xl overflow-hidden flex flex-col md:flex-row">
-      <div className="md:w-1/3">
-        <img
-          src={thumbnail || "https://via.placeholder.com/400x300"}
-          alt={title}
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="md:w-2/3 p-6 flex flex-col justify-between">
+    <div className="bg-white rounded-2xl shadow-md p-6 flex flex-col md:flex-row gap-6 hover:shadow-lg transition-all duration-300">
+      <img
+        src={thumbnail || "https://via.placeholder.com/400x300?text=Assignment"}
+        alt={title}
+        className="w-full md:w-1/3 h-48 object-cover rounded-xl"
+      />
+
+      <div className="flex-1 flex flex-col justify-between">
         <div>
-          <h2 className="text-2xl font-bold">{title}</h2>
-          <p className="text-gray-700">{description}</p>
-          <p className="text-sm text-indigo-600">Marks: {marks}</p>
-          <p
-            className={`text-xs font-semibold px-3 py-1 mt-2 rounded-full ${
-              difficultyColors[difficulty?.toLowerCase()]
-            }`}
-          >
-            {difficulty}
-          </p>
+          <h2 className="text-2xl font-semibold text-gray-900 mb-1">{title}</h2>
+          <p className="text-gray-600 text-sm mb-3 line-clamp-2">{description}</p>
+
+          <div className="flex items-center gap-4 text-sm text-gray-700 mb-3">
+            <span>
+              <strong>Marks:</strong> {marks}
+            </span>
+            <span
+              className={`px-3 py-1 rounded-full text-xs font-medium ${getDifficultyStyle(
+                difficulty
+              )}`}
+            >
+              {difficulty || "Unknown"}
+            </span>
+          </div>
         </div>
-        <div className="flex justify-end gap-2 mt-4">
+
+        <div className="flex flex-wrap gap-2 mt-4 justify-end">
           <Link to={`/assignments/${_id}`}>
-            <button className="bg-blue-600 text-white px-4 py-2 rounded-md flex items-center gap-1">
+            <button className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-blue-700 text-sm">
               <Eye size={16} /> View
             </button>
           </Link>
-          <Link to={`/update-assignment/${_id}`}>
-            <button className="bg-yellow-500 text-white px-4 py-2 rounded-md flex items-center gap-1">
-              <Pencil size={16} /> Update
-            </button>
-          </Link>
-          <button
-            onClick={() => handleDelete(_id)}
-            className="bg-red-600 text-white px-4 py-2 rounded-md flex items-center gap-1"
-          >
-            <Trash2 size={16} /> Delete
-          </button>
+
+          {userEmail === assignment.createdByEmail && (
+            <>
+              <Link to={`/update-assignment/${_id}`}>
+                <button className="bg-yellow-500 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-yellow-600 text-sm">
+                  <Pencil size={16} /> Edit
+                </button>
+              </Link>
+
+              <button
+                onClick={handleDelete}
+                className="bg-red-600 text-white px-4 py-2 rounded-lg flex items-center gap-1 hover:bg-red-700 text-sm"
+              >
+                <Trash2 size={16} /> Delete
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>

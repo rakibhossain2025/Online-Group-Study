@@ -9,6 +9,7 @@ import ViewAssignment from "../components/ViewAssignment";
 import UpdateAssignment from "../components/UpdateAssignment";
 import MyAttempts from "../components/MyAttempts";
 import Pending from "../pages/Private/Pending";
+import RequireAuth from "../context/RequireAuth";
 
 const router = createBrowserRouter([
   {
@@ -33,11 +34,11 @@ const router = createBrowserRouter([
       },
       {
         path: "/pending-assignment",
-        Component: Pending,
+        element: <RequireAuth ><Pending /></RequireAuth>,
       },
       {
         path: "/create-assignment",
-        Component: CreateAssignment,
+        element: <RequireAuth ><CreateAssignment /></RequireAuth>,
       },
       {
         path: '/update-assignment/:id',
@@ -47,7 +48,7 @@ const router = createBrowserRouter([
       {
         path: '/assignments/:id',
         loader: ({ params }) => fetch(`http://localhost:2002/assignments/${params.id}`),
-        Component: ViewAssignment,
+        element: <RequireAuth ><ViewAssignment /></RequireAuth>,
       }, {
         path: '/assignments',
         loader: () => fetch('http://localhost:2002/assignments'),
@@ -57,45 +58,3 @@ const router = createBrowserRouter([
   },
 ]);
 export default router;
-
-
-//! reviewed data like
-//! assignmentId
-// : 
-// "68494bf6161c9fec81d3e640"
-// docsLink
-// : 
-// "https://docs.google.com/document/d/1rZTzqLoPYEPfiRB9YMiA4-yc_KpkFsms1OsZdSg0_o8/edit?tab=t.0"
-// examineEmail
-// : 
-// "sojib1235@gmail.com"
-// examineName
-// : 
-// "Sojib Ahmed"
-// examiner
-// : 
-// "Scarlet Sherman"
-// examinerEmail
-// : 
-// "hawabih@mailinator.com"
-// feedback
-// : 
-// "a"
-// givenMark
-// : 
-// "32"
-// note
-// : 
-// "Rakib vai RR"
-// status
-// : 
-// "reviewed"
-// title
-// : 
-// "Build a Weather Forecast Dashboard"
-// totalMark
-// : 
-// "100"
-// _id
-// : 
-// "68518681daeae04a3868bfcd"
